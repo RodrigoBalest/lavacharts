@@ -46,18 +46,22 @@ class LavachartsServiceProvider extends ServiceProvider
          */
         if (method_exists($this, 'package')) {
             $this->package('khill/lavacharts');
+            include __DIR__.'/BladeTemplateExtensions.php';
+        } else {
+            $this->publishes([
+                $this->configPath => config_path($this->configFile),
+            ], 'lavacharts');
         }
-
-        include __DIR__.'/BladeTemplateExtensions.php';
-
-        $this->publishes([
-            $this->configPath => config_path($this->configFile),
-        ], 'lavacharts');
     }
 
     public function register()
     {
-        $this->mergeConfigFrom($this->configPath, 'lavacharts');
+        /**
+         * If the package method exists, we're using Laravel 4
+         */
+        if (! method_exists($this, 'package')) {
+            $this->mergeConfigFrom($this->configPath, 'lavacharts');
+        }
 
         $defaultConfig = $this->app['config']->get('lavacharts');
 
